@@ -1,0 +1,98 @@
+﻿@page "/ordermilkshake"
+
+@inject IMilkShakeService orderService
+
+<h3>Order Milkshake</h3>
+
+@if (submitResult != null)
+{
+    <h4 class="text-success">@submitResult</h4>
+}
+
+@if (showOrderForm)
+{
+<EditForm Model="@order" OnValidSubmit="HandleOnValidSubmit">
+    <DataAnnotationsValidator/>
+    <ValidationSummary/>
+<p>
+    <label>
+        Milkshake Type : 
+        <InputSelect @bind-Value="order.TypleOfMilkshake">
+            <option value="">Select a Milkshake type ...</option>
+            @foreach (var t in milkshaketypes)
+                {
+                    <option value="@t">@t</option>
+                }
+        </InputSelect>
+    </label>
+</p>
+    <p>
+        <label>
+            Milkshake Size :
+            <InputSelect @bind-Value="order.SizeOfMilkshake">
+                <option value="">Select a Milkshake size ...</option>
+                @foreach (var s in milkshakeSizes)
+                {
+                    <option value="@s">@s</option>
+                }
+            </InputSelect>
+        </label>
+    </p>
+
+    <p>
+        <label>
+           Order Name :
+           <InputText @bind-Value="order.OrderName"/>
+        </label>
+    </p>
+    <p>
+        <label>
+            Quantity :
+            <InputNumber @bind-Value="order.Quantity" />
+        </label>
+    </p>
+    <p>
+        <label>
+            Add Whipper Cream :
+            <InputCheckbox @bind-Value="order.AddWhippedCream" />
+        </label>
+    </p>
+    <button class="btn btn-outline-primary" type="submit">Submit Order</button>
+
+</EditForm>
+    
+}
+
+
+@code {
+    private MilkshakeOrderingModel order = new MilkshakeOrderingModel();
+
+    private List<string> milkshakeSizes;
+    private List<string> milkshaketypes;
+    private string submitResult;
+    private bool showOrderForm = true;
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        milkshaketypes = orderService.GetMilkshakeTypes();
+        milkshakeSizes = orderService.GetMilkshakeSizess();
+    }
+
+    private void HandleOnValidSubmit()
+    {
+        showOrderForm = false;
+        switch (order.Quantity)
+        {
+            case 1:
+                submitResult = $"Your Order for {order.Quantity} {order.SizeOfMilkshake} {order.TypleOfMilkshake} milkshake has been placed.";
+                break;
+            default:
+                submitResult = $"Your Order for {order.Quantity} {order.SizeOfMilkshake} {order.TypleOfMilkshake} milkshakes has been placed.";
+                break;
+        }
+      
+        //submitResult = $"Milkshake order of type {order.TypleOfMilkshake} and size of {order.SizeOfMilkshake} with quantity of {order.Quantity} to Order name : {order.OrderName} is prossecced.";
+    }
+}
